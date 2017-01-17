@@ -1,11 +1,3 @@
-//
-//  ToastController.h
-//  ToastController
-//
-//  Created by Sebastián Varela on 17/1/17.
-//  Copyright © 2017 CIBER. All rights reserved.
-//
-
 #import <UIKit/UIKit.h>
 
 //! Project version number for ToastController.
