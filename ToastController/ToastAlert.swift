@@ -40,14 +40,14 @@ public struct ToastAlert {
         return title != nil ? 150 : 60
     }
     
-    init(level: ToastAlertLevel, message: String, persistent: Bool = false) {
+    public init(level: ToastAlertLevel, message: String, persistent: Bool = false) {
         self.level = level
         self.title = nil
         self.message = message
         self.persistent = persistent
     }
     
-    init(level: ToastAlertLevel, title: String, message: String, persistent: Bool = false) {
+    public init(level: ToastAlertLevel, title: String, message: String, persistent: Bool = false) {
         self.level = level
         self.title = title
         self.message = message
