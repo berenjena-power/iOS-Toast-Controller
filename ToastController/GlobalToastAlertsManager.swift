@@ -8,7 +8,7 @@ enum ToastRemoveType {
     case fromTimer, fromPanGesture, fromTapGesture
 }
 
-class GlobalToastAlertsManager {
+public class GlobalToastAlertsManager {
     
     var toastsWindow: AlertWindow?
     fileprivate var toastAlertsViewController: ToastAlertViewController?

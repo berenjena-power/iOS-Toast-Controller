@@ -3,7 +3,7 @@ import UIKit
 import Cartography
 import Helpers
 
-enum ToastAlertLevel {
+public enum ToastAlertLevel {
     case success, info, warning, error
 }
 
@@ -12,7 +12,6 @@ protocol ToastAlertPresentable {
 }
 
 class ToastAlertView: UIView {
-    
     override init(frame: CGRect) {
         super.init(frame: frame)
         
@@ -27,12 +26,11 @@ class ToastAlertView: UIView {
     }
 }
 
-struct ToastAlert {
+public struct ToastAlert {
     
     static let toastDuration: Double = 5
     static let topMargin: CGFloat = 16
     static let lateralMargin: CGFloat = 20
-    
     
     let level: ToastAlertLevel
     let title: String?
