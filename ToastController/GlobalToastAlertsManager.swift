@@ -33,7 +33,7 @@ public class GlobalToastAlertsManager {
     }
     fileprivate var dismissingCache: [ToastAlert]
     
-    init(applicationRootWindow: UIWindow, navigationBarHeight: CGFloat) {
+    public init(applicationRootWindow: UIWindow, navigationBarHeight: CGFloat) {
         self.applicationRootWindow = applicationRootWindow
         self.navigationBarHeight = navigationBarHeight
         toastsWindow = nil
@@ -68,7 +68,7 @@ public class GlobalToastAlertsManager {
         }
     }
     
-    func addToastAlert(_ newToastAlert: ToastAlert) {
+    public func addToastAlert(_ newToastAlert: ToastAlert) {
         
         if dismissing {
             dismissingCache.append(newToastAlert)
@@ -124,7 +124,7 @@ class AlertWindow: UIWindow {
     }
 }
 
-func += (left: GlobalToastAlertsManager, right: ToastAlert) {
+public func += (left: GlobalToastAlertsManager, right: ToastAlert) {
     left.addToastAlert(right)
 }
 
