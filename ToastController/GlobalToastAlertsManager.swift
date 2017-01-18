@@ -20,9 +20,7 @@ public class GlobalToastAlertsManager {
     
     fileprivate let applicationRootWindow: UIWindow
     fileprivate let navigationBarHeight: CGFloat
-	
-	var toastDidPress:((_ toast: ToastAlert)->Void)?
-	
+		
     fileprivate var dismissing: Bool {
         didSet {
             if dismissing == false && !dismissingCache.isEmpty {
@@ -47,13 +45,7 @@ public class GlobalToastAlertsManager {
     
     fileprivate func subscribeToRemoveAlertsSignal() {
         removeAlertDisposable = removeAlertSignal.observeValues { [unowned self] removeType in
-			
-			// Como controlarias este caso? Si siempre se elimina la primera
-			if self.toastDidPress != nil && removeType == .fromTapGesture
-			{
-				self.toastDidPress!(self.toastAlertsModels.first!)
-			}
-			
+						
 			self.toastAlertsModels.removeFirst()
             
             if self.toastAlertsModels.isEmpty {
