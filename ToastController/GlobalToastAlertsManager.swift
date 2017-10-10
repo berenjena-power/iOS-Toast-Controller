@@ -15,7 +15,7 @@ public class GlobalToastAlertsManager {
     fileprivate var toastAlertsModels: [ToastAlert]
     
     fileprivate var removeAlertSignal: Signal<ToastRemoveType, NoError>
-    fileprivate var removeAlertObserver: Observer<ToastRemoveType, NoError>
+    fileprivate var removeAlertObserver: Signal<ToastRemoveType, NoError>.Observer
     fileprivate var removeAlertDisposable: Disposable?
     
     fileprivate let applicationRootWindow: UIWindow

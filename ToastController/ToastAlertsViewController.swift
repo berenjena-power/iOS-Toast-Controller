@@ -14,7 +14,7 @@ class ToastAlertViewController: UIViewController {
     
     fileprivate var currentToastAlertModel: ToastAlert
     fileprivate (set) var currentToastView: UIView?
-    fileprivate let removeAlertObserver: Observer<ToastRemoveType, NoError>
+    fileprivate let removeAlertObserver: Signal<ToastRemoveType, NoError>.Observer
     
     fileprivate var timer: PausableTimer?
     fileprivate var panGestureRecognizer: UIPanGestureRecognizer!
@@ -22,7 +22,7 @@ class ToastAlertViewController: UIViewController {
     
     fileprivate let navigationBarHeight: CGFloat
     
-    init(toastsWindow: UIWindow, firstToastAlertModel: ToastAlert, removeAlertObserver: Observer<ToastRemoveType, NoError>, navigationBarHeight: CGFloat) {
+    init(toastsWindow: UIWindow, firstToastAlertModel: ToastAlert, removeAlertObserver: Signal<ToastRemoveType, NoError>.Observer, navigationBarHeight: CGFloat) {
         self.toastsWindow = toastsWindow
         currentToastAlertModel = firstToastAlertModel
         self.removeAlertObserver = removeAlertObserver
@@ -59,12 +59,13 @@ class ToastAlertViewController: UIViewController {
             self.view.layoutIfNeeded()
         }, completion: nil)
     }
-        
+    
     fileprivate func configureTimer() {
         if !currentToastAlertModel.persistent {
-            timer = PausableTimer(timerDuration: ToastAlert.toastDuration) { [weak self] _ in
-                self?.removeAlertObserver.send(value: .fromTimer)
-            }.start()
+            weak var weakSelf = self
+            timer = PausableTimer(timerDuration: ToastAlert.toastDuration) {
+                weakSelf?.removeAlertObserver.send(value: .fromTimer)
+                }.start()
         }
     }
     
@@ -73,10 +74,9 @@ class ToastAlertViewController: UIViewController {
         
         let maxWidth: CGFloat = 500
         
-        constrain(toastView, self.view) {
-            toastView, toastContainerView in
+        constrain(toastView, self.view) { toastView, toastContainerView in
             topConstraint = toastView.top == toastContainerView.top + 60
-            (toastView.width == maxWidth) ~ 750
+            (toastView.width == maxWidth) ~ LayoutPriority(rawValue: 750)
             toastView.leading >= toastContainerView.leading + 20
             toastView.trailing <= toastContainerView.trailing - 20
             toastView.centerX == toastContainerView.centerX
@@ -94,12 +94,12 @@ class ToastAlertViewController: UIViewController {
 	}
 	
 	
-	func handleTapGesture(_ gestureRecognizer: UITapGestureRecognizer)
+	@objc func handleTapGesture(_ gestureRecognizer: UITapGestureRecognizer)
 	{
 		self.removeAlertObserver.send(value: .fromTapGesture)
 	}
 	
-    func handlePanGesture(_ gestureRecognizer: UIPanGestureRecognizer) {
+    @objc func handlePanGesture(_ gestureRecognizer: UIPanGestureRecognizer) {
         switch gestureRecognizer.state {
         case .began:
             timer?.pause()
@@ -187,27 +187,31 @@ class ToastAlertViewController: UIViewController {
     }
     
     func removeCurrentToastViewFromPanGestureAndPresentNext(_ nextToastAlertModel: ToastAlert) {
-        guard let _ = currentToastView else {
+        guard let currentToastView = currentToastView else {
             logError("There's no current toast view to remove.")
             return
         }
         
         timer?.stop()
         
-        self.currentToastView!.alpha = 0.0
+        currentToastView.alpha = 0.0
         
         let nextToastView = nextToastAlertModel.buildToastAlertView()
-        self.currentToastView!.removeFromSuperview()
-        self.placeToastViewInView(nextToastView)
-        self.currentToastAlertModel = nextToastAlertModel
+        currentToastView.removeFromSuperview()
+        placeToastViewInView(nextToastView)
+        currentToastAlertModel = nextToastAlertModel
         self.currentToastView = nextToastView
         
-        self.currentToastView!.alpha = 0.0
-        self.currentToastView?.removeGestureRecognizer(panGestureRecognizer)
-        UIView.animate(withDuration: self.animationDuration, delay: 0.0, options: .allowUserInteraction, animations: { [unowned self] _ in
-            self.currentToastView!.alpha = 1.0
-        }, completion: { [unowned self] _ in
-            self.currentToastView?.addGestureRecognizer(self.panGestureRecognizer)
+        currentToastView.alpha = 0.0
+        currentToastView.removeGestureRecognizer(panGestureRecognizer)
+        
+        UIView.animate(withDuration: animationDuration,
+                       delay: 0.0,
+                       options: .allowUserInteraction,
+                       animations: {
+            currentToastView.alpha = 1.0
+        }, completion: { _ in
+            currentToastView.addGestureRecognizer(self.panGestureRecognizer)
             self.configureTimer()
         })
     }
